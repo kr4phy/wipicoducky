@@ -47,34 +47,34 @@ layout = KeyboardLayoutUS(keyboard)
 
 irremote_payloads = [
     # 0번: 기본 명령 테스트
-    "GUI\nDELAY 200\nSTRING cmd\nDELAY 200\nENTER\nDELAY 1500\nDELAY 200\nSTRING echo HELLO WORLD\nDELAY 200\nENTER\n",
+    "GUI\nSTRING cmd\nDELAY 200\nENTER\nDELAY 1500\nSTRING echo HELLO WORLD\nENTER\n",
     
     # 1번: 시스템 정보 조회
-    "GUI\nDELAY 200\nSTRING cmd\nDELAY 200\nENTER\nDELAY 1500\nDELAY 200\nSTRING systeminfo | findstr /I OS\nDELAY 200\nENTER\n",
+    "GUI\nSTRING cmd\nDELAY 200\nENTER\nDELAY 1500\nSTRING systeminfo | findstr /I OS\nENTER\n",
     
     # 2번: 현재 디렉토리 목록
-    "GUI\nDELAY 200\nSTRING cmd\nDELAY 200\nENTER\nDELAY 1500\nDELAY 200\nSTRING dir\nDELAY 200\nENTER\n",
+    "GUI\nSTRING cmd\nDELAY 200\nENTER\nDELAY 1500\nSTRING dir\nENTER\n",
     
     # 3번: 네트워크 설정 확인
-    "GUI\nDELAY 200\nSTRING cmd\nDELAY 200\nENTER\nDELAY 1500\nDELAY 200\nSTRING ipconfig\nDELAY 200\nENTER\n",
+    "GUI\nSTRING cmd\nDELAY 200\nENTER\nDELAY 1500\nSTRING ipconfig\nENTER\n",
     
     # 4번: 파일 탐색기 열기
-    "GUI\nDELAY 200\nSTRING cmd\nDELAY 200\nENTER\nDELAY 1500\nDELAY 200\nSTRING explorer C:\\\nDELAY 200\nENTER\n",
+    "GUI\nSTRING cmd\nDELAY 200\nENTER\nDELAY 1500\nSTRING explorer C:\\\nENTER\n",
     
     # 5번: 작업 관리자 열기 (Ctrl+Shift+Esc 동시 입력)
     "CTRL SHIFT ESC\n",
     
     # 6번: 메모장 열기
-    "GUI\nDELAY 200\nSTRING notepad\nDELAY 200\nENTER\n",
+    "GUI\nSTRING notepad\nDELAY 200\nENTER\n",
     
     # 7번: PowerShell 열기
-    "GUI\nDELAY 200\nSTRING powershell\nDELAY 200\nENTER\n",
+    "GUI\nSTRING powershell\nDELAY 200\nENTER\n",
     
     # 8번: 디스크 용량 확인
-    "GUI\nDELAY 200\nSTRING cmd\nDELAY 200\nENTER\nDELAY 1500\nDELAY 200\nSTRING wmic logicaldisk get size,freespace,name\nDELAY 200\nENTER\n",
+    "GUI\nSTRING cmd\nDELAY 200\nENTER\nDELAY 1500\nSTRING wmic logicaldisk get size,freespace,name\nENTER\n",
     
     # 9번: 프로세스 목록 확인
-    "GUI\nDELAY 200\nSTRING cmd\nDELAY 200\nENTER\nDELAY 1500\nDELAY 200\nSTRING tasklist\nDELAY 200\nENTER\n",
+    "ALT F4\n",
 ]
 
 def decodeKeyValue(data):
@@ -213,4 +213,5 @@ except KeyboardInterrupt:
     except Exception:
         pass
     print("IR -> HID stopped")
+
 
