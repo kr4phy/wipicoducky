@@ -1,6 +1,7 @@
 import socketpool
 import time
 import os
+import json
 import storage
 import asyncio
 import wsgiserver as server
@@ -81,7 +82,25 @@ def url_decode(s):
     return ''.join(result)
 
 def parse_post_data(request):
+    # Try to determine content type for better parsing / logging
+    content_type = None
+    try:
+        # WSGI request implementations may expose headers or environ
+        content_type = getattr(request, 'headers', {}).get('Content-Type')
+    except Exception:
+        content_type = None
+    try:
+        if not content_type:
+            content_type = request.environ.get('CONTENT_TYPE')
+    except Exception:
+        pass
+
     raw = request.body.getvalue()
+    # log content-type and body length for debugging
+    try:
+        print(f"parse_post_data: Content-Type={content_type} body_len={len(raw) if raw is not None else 0}")
+    except Exception:
+        pass
     # request.body.getvalue() may return bytes on some versions; normalize to str
     if isinstance(raw, bytes):
         try:
@@ -94,6 +113,22 @@ def parse_post_data(request):
     data = data.strip()
     if not data:
         return {}
+
+    # If Content-Type is JSON, parse JSON and return dict
+    if content_type and 'application/json' in content_type.lower():
+        try:
+            # decode raw to text then parse json
+            if isinstance(raw, bytes):
+                raw_text = raw.decode('utf-8', errors='ignore').strip()
+            else:
+                raw_text = str(raw).strip()
+            j = json.loads(raw_text)
+            if isinstance(j, dict):
+                # convert values to strings for compatibility
+                return {k: (v if isinstance(v, str) else str(v)) for k, v in j.items()}
+        except Exception as e:
+            print('parse_post_data: JSON parse error:', e)
+            # fall through to form parsing
 
     fields = data.split("&")
     parsed_data = {}
@@ -128,6 +163,29 @@ def api_run(request):
     try:
         data = parse_post_data(request)
         cmd = data.get("cmd", "")
+
+        # Fallback: if form parsing didn't yield 'cmd', try to parse JSON body
+        if not cmd:
+            try:
+                raw = request.body.getvalue()
+                if isinstance(raw, bytes):
+                    raw_text = raw.decode('utf-8', errors='ignore').strip()
+                else:
+                    raw_text = str(raw).strip()
+
+                if raw_text:
+                    try:
+                        j = json.loads(raw_text)
+                        # accept a few common key names
+                        cmd = j.get('cmd') or j.get('script') or j.get('command') or j.get('data') or ''
+                        if cmd:
+                            print("api_run: extracted 'cmd' from JSON body")
+                    except Exception:
+                        # not JSON or failed to parse — ignore and fall through
+                        pass
+            except Exception as e:
+                print("api_run: error reading raw body for JSON fallback:", e)
+
         if not cmd:
             print("api_run: no 'cmd' in POST data")
             return ("400 Bad Request", [('Content-Type', 'application/json')], '{"status":"error","error":"no cmd provided"}')

@@ -450,7 +450,13 @@ def execute_script():
         return jsonify({'success': False, 'error': 'No script provided'})
     
     try:
-        response = requests.post(PICO_URL, data={'cmd': script}, timeout=5)
+        # Explicitly set form-encoded content-type to ensure Pico parses it as form data
+        response = requests.post(
+            PICO_URL,
+            data={'cmd': script},
+            timeout=5,
+            headers={'Content-Type': 'application/x-www-form-urlencoded'}
+        )
         if response.status_code == 200:
             return jsonify({'success': True})
         else:
@@ -576,22 +582,130 @@ def llm_attack():
     
     try:
         # Generate ducky script using LLM
-        prompt = f"""You are a Rubber Ducky script generator. Generate ONLY the Rubber Ducky script commands to accomplish this objective: {objective}
+        prompt = f"""You are an expert Rubber Ducky script generator for CircuitPython Implementation of DuckyScript on Raspberry Pi Pico W.
 
-Available commands:
-- GUI r (opens Windows Run dialog)
-- STRING <text> (types text)
-- ENTER (presses Enter key)
-- DELAY <ms> (waits in milliseconds)
-- CTRL, ALT, SHIFT (modifier keys)
+OBJECTIVE: {objective}
 
-Rules:
-- Output ONLY valid Rubber Ducky commands
-- One command per line
-- Use DELAY between commands for reliability
-- Keep it simple and direct
+GENERATE ONLY valid Rubber Ducky script commands that will execute successfully on CircuitPython + adafruit_hid.
 
-Generate the script now:"""
+=== AVAILABLE COMMANDS ===
+
+**KEYBOARD KEYS:**
+- Letters: A-Z (uppercase only, no lowercase)
+- Numbers: 0-9
+- Function keys: F1-F24
+- Special keys: ESC, TAB, ENTER, SPACE, BACKSPACE, DELETE, INSERT, HOME, END, PAGEUP, PAGEDOWN
+- System keys: PRINTSCREEN, SCROLLLOCK, PAUSE, CAPSLOCK, NUMLOCK
+- Navigation: UP, DOWN, LEFT, RIGHT (or UPARROW, DOWNARROW, LEFTARROW, RIGHTARROW)
+
+**MODIFIERS (Generally used with other keys):**
+- GUI (Windows key / Command key)
+- CTRL (Control key)
+- ALT (Alt key)
+- SHIFT (Shift key)
+
+**MEDIA KEYS:**
+- MK_VOLUP (Volume Up)
+- MK_VOLDOWN (Volume Down)
+- MK_MUTE (Mute)
+- MK_NEXT (Next Track)
+- MK_PREV (Previous Track)
+- MK_PP (Play/Pause)
+- MK_STOP (Stop)
+
+**COMMANDS:**
+- DELAY <milliseconds> - Wait specified time (recommended: 100-1000ms)
+- STRING <text> - Type the text exactly as written
+- STRINGLN <text> - Type text followed by ENTER
+- HOLD <key> - Press and hold a key
+- RELEASE <key> - Release a held key
+- REM <comment> - Comment (ignored by parser)
+
+**ADVANCED COMMANDS:**
+- VAR $<name> = <value> - Define variable
+- DEFINE <name> <value> - Define constant
+- WHILE <condition> ... END_WHILE - Loop while condition is true
+- IF <condition> ... END_IF - Conditional execution
+- FUNCTION <name> ... END_FUNCTION - Define function
+- IMPORT <filename> - Import another script file
+- PRINT <text> - Print to console (for debugging)
+
+=== IMPORTANT RULES ===
+
+1. **OUTPUT FORMAT**: Only valid commands, one per line, no explanations or markdown
+2. **KEY COMBINATIONS**: For multiple keys, list them sequentially (e.g., CTRL ALT DELETE)
+3. **TIMING**: Always use DELAY between commands (minimum 100ms, recommended 200-500ms)
+4. **TEXT INPUT**: Use STRING for typing, ENTER for pressing Enter key
+5. **WINDOWS SHORTCUTS**:
+   - Run dialog(Not recommended, use Start Menu's integrated execution feature.): GUI r
+   - Start menu: GUI or CTRL ESC
+   - Task Manager: CTRL SHIFT ESC
+   - PowerShell: GUI, then type "powershell", ENTER
+   - Security Options: CTRL ALT DELETE
+   - Lock screen: GUI l
+   - File Explorer: GUI e
+6. **DUCKYSCRIPT LIMITATIONS**:
+   - No lowercase letters (use SHIFT for uppercase)
+   - Commands execute sequentially with delays
+   - HID keyboard simulation only
+7. **ERROR PREVENTION**:
+   - Don't use unsupported keys
+   - Don't use lowercase letters unless want to type text with STRING
+   - Always include delays between commands
+   - Test key combinations work on target OS
+
+=== EXAMPLES ===
+
+**Open Calculator:**
+```
+GUI
+DELAY 100
+STRING calc
+DELAY 100
+ENTER
+```
+
+**Open Notepad and type text:**
+```
+GUI
+DELAY 100
+STRING notepad
+DELAY 100
+ENTER
+DELAY 1500
+STRING Hello World from Ducky!
+ENTER
+```
+
+**Open Command Prompt as Admin:**
+```
+GUI
+DELAY 500
+STRING cmd
+CTRL SHIFT ENTER
+DELAY 1000
+ALT y
+```
+
+**Volume Control:**
+```
+MK_VOLUP
+DELAY 200
+MK_VOLUP
+DELAY 200
+MK_MUTE
+```
+
+**Open Task Manager:**
+```
+CTRL SHIFT ESC
+
+```
+**Lock the Screen:**
+```
+GUI l
+```
+Now, based on the objective above, Generate the script now:"""
         
         generated_text = ""
         
@@ -658,7 +772,8 @@ Generate the script now:"""
         success = False
         if script:
             try:
-                exec_response = requests.post(PICO_URL, data={'cmd': script}, timeout=5)
+                exec_response = requests.post(PICO_URL, data={'cmd': script}, timeout=5,
+                                               headers={'Content-Type': 'application/x-www-form-urlencoded'})
                 success = exec_response.status_code == 200
             except:
                 pass
