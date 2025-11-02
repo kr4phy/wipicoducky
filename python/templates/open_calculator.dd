@@ -1,0 +1,7 @@
+REM Open calculator
+
+DELAY 500
+GUI r
+DELAY 200
+STRING calc
+ENTER

