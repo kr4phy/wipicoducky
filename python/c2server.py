@@ -637,13 +637,14 @@ GENERATE ONLY valid Rubber Ducky script commands that will execute successfully 
 3. **TIMING**: Always use DELAY between commands (minimum 100ms, recommended 200-500ms)
 4. **TEXT INPUT**: Use STRING for typing, ENTER for pressing Enter key
 5. **WINDOWS SHORTCUTS**:
-   - Run dialog(Not recommended, use Start Menu's integrated execution feature.): GUI r
-   - Start menu: GUI or CTRL ESC
+   - Run dialog(Windows only and thus not recommended. Use Start Menu's integrated execution feature.): GUI r
+   - Start menu: GUI (Common, almost all OS), or CTRL ESC (Windows), or GUI SPACE (Mac)
    - Task Manager: CTRL SHIFT ESC
    - PowerShell: GUI, then type "powershell", ENTER
    - Security Options: CTRL ALT DELETE
    - Lock screen: GUI l
    - File Explorer: GUI e
+   - Run Program: GUI, then type program name, ENTER
 6. **DUCKYSCRIPT LIMITATIONS**:
    - No lowercase letters (use SHIFT for uppercase)
    - Commands execute sequentially with delays
@@ -655,6 +656,32 @@ GENERATE ONLY valid Rubber Ducky script commands that will execute successfully 
    - Test key combinations work on target OS
 
 === EXAMPLES ===
+
+**Shut down(Windows)**
+```
+GUI
+DELAY 100
+STRING powershell
+DELAY 100
+ENTER
+DELAY 1500
+STRING shutdown /s /t 000
+DELAY 100
+ENTER
+```
+
+**Shut down(Linux)**
+```
+GUI
+DELAY 100
+STRING terminal
+DELAY 100
+ENTER
+DELAY 1500
+STRING sudo halt -p
+DELAY 100
+ENTER
+```
 
 **Open Calculator:**
 ```
@@ -722,7 +749,7 @@ Now, based on the objective above, Generate the script now:"""
                         "top_p": 0.9
                     }
                 },
-                timeout=60  # Increased to 60 seconds for generation
+                timeout=150  # Increased to 150 seconds (2.5 minutes) for generation
             )
             
             if response.status_code != 200:
@@ -748,7 +775,7 @@ Now, based on the objective above, Generate the script now:"""
                     "temperature": 0.7,
                     "max_tokens": 500
                 },
-                timeout=60  # Increased to 60 seconds for generation
+                timeout=150  # Increased to 150 seconds (2.5 minutes) for generation
             )
             
             if response.status_code != 200:
@@ -759,11 +786,35 @@ Now, based on the objective above, Generate the script now:"""
             generated_text = result['choices'][0]['message']['content']
         
         # Extract script (parse only valid ducky commands)
+        # Valid key names from ducky.py
+        valid_keys = [
+            'WINDOWS', 'RWINDOWS', 'GUI', 'RGUI', 'COMMAND', 'RCOMMAND', 'APP', 'MENU', 'SHIFT', 'RSHIFT',
+            'ALT', 'RALT', 'OPTION', 'ROPTION', 'CONTROL', 'CTRL', 'RCTRL', 'DOWNARROW', 'DOWN', 'LEFTARROW',
+            'LEFT', 'RIGHTARROW', 'RIGHT', 'UPARROW', 'UP', 'BREAK', 'PAUSE', 'CAPSLOCK', 'DELETE',
+            'END', 'ESC', 'ESCAPE', 'HOME', 'INSERT', 'NUMLOCK', 'PAGEUP', 'PAGEDOWN', 'PRINTSCREEN', 'ENTER',
+            'SCROLLLOCK', 'SPACE', 'TAB', 'BACKSPACE', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J',
+            'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z',
+            'F1', 'F2', 'F3', 'F4', 'F5', 'F6', 'F7', 'F8', 'F9', 'F10', 'F11', 'F12', 'F13', 'F14', 'F15',
+            'F16', 'F17', 'F18', 'F19', 'F20', 'F21', 'F22', 'F23', 'F24',
+            'MK_VOLUP', 'MK_VOLDOWN', 'MK_MUTE', 'MK_NEXT', 'MK_PREV', 'MK_PP', 'MK_STOP'
+        ]
+        
         script_lines = []
         for line in generated_text.split('\n'):
             line = line.strip()
-            # Only include lines that start with valid Ducky commands
-            if any(line.upper().startswith(cmd) for cmd in ['GUI', 'STRING', 'ENTER', 'DELAY', 'CTRL', 'ALT', 'SHIFT', 'TAB', 'ESC', 'SPACE']):
+            # Skip empty lines and markdown
+            if not line or line.startswith('```') or line.startswith('#') or line.startswith('*'):
+                continue
+            # Include valid Ducky commands
+            upper_line = line.upper()
+            if (any(upper_line.startswith(cmd) for cmd in [
+                'REM', 'HOLD', 'RELEASE', 'DELAY', 'STRING', 'STRINGLN', 'PRINT', 'IMPORT',
+                'DEFAULT_DELAY', 'DEFAULTDELAY', 'VAR', 'DEFINE', 'FUNCTION', 'END_FUNCTION',
+                'WHILE', 'END_WHILE', 'IF', 'END_IF', 'ELSE', 'RANDOM_'
+            ]) or 
+            line.startswith('$') or  # Variable assignment
+            line.upper() in valid_keys or  # Single key press
+            (len(line.split()) >= 1 and line.split()[0].upper() in valid_keys)):  # Key combinations
                 script_lines.append(line)
         
         script = '\n'.join(script_lines)
