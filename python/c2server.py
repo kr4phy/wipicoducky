@@ -105,7 +105,7 @@ HTML_TEMPLATE = """
                     <div id="ollama-fields">
                         <div class="mb-3">
                             <label for="llm-model" class="block text-sm font-medium mb-2">Model:</label>
-                            <input type="text" id="llm-model" value="phi4:mini" placeholder="e.g., phi4:mini, llama2, mistral" class="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md">
+                            <input type="text" id="llm-model" value="gemma3:4b" placeholder="e.g., gemma3:4b, llama3.2, mistral-nemo" class="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md">
                         </div>
                         <div>
                             <label for="llm-url" class="block text-sm font-medium mb-2">Ollama URL:</label>
@@ -116,7 +116,7 @@ HTML_TEMPLATE = """
                         <div class="mb-3">
                             <label for="llm-model-or" class="block text-sm font-medium mb-2">Model:</label>
                             <input type="text" id="llm-model-or" value="devstral-small-2505:free" class="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md" placeholder="devstral-small-2505:free">
-                            <p class="text-xs text-gray-400 mt-1">Free model: devstral-small-2505:free (recommended for Ducky scripts)</p>
+                            <p class="text-xs text-gray-400 mt-1">Free model: devstral-small-2505 or other some models.</p>
                         </div>
                         <div>
                             <label for="llm-apikey" class="block text-sm font-medium mb-2">API Key:</label>
