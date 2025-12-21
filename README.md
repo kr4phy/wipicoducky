@@ -1,17 +1,17 @@
-# wipicoducky (Pico Ducky fork)
+# wipicoducky
 
-이 저장소는 https://github.com/dbisu/pico-ducky 를 기반으로 만들어진 프로젝트입니다.
-원본 프로젝트는 Dave Bailey (@dbisu)가 작성하였고, 본 프로젝트는 해당 프로젝트를 포크/확장하여 사용합니다.
+이 프로젝트는 https://github.com/dbisu/pico-ducky 를 기반으로 만들어진 프로젝트입니다.
+원본 프로젝트는 Dave Bailey (@dbisu)가 작성하였고, 본 프로젝트는 해당 프로젝트의 일부를 사용합니다.
 
 라이선스
 - 본 저장소 및 파생작은 GNU General Public License version 2 (GPLv2) 하에 배포됩니다. 자세한 라이선스 전문은 `LICENSE` 파일을 확인하세요.
 
 크레딧
 - 원작자: Dave Bailey (dbisu) — https://github.com/dbisu/pico-ducky
-- 본 포크/변경: kr4phy (현재 저장소)
+- 변경: kr4phy (현재 저장소)
 
 개요
-- Pico (CircuitPython) 기반으로 IR 리모컨을 통해 Ducky 스크립트(USB HID 입력)를 실행하도록 구현한 코드 모음입니다.
+- Pico (CircuitPython) 기반으로 IR 리모컨 또는 Web UI를 통해 Ducky 스크립트(USB HID 입력)를 실행하도록 구현한 코드 모음입니다.
 - 주요 파일:
   - `circuitpython/irremote_nonblocking.py` — NonblockingGenericDecode 사용, IR -> HID, 리모컨 버튼으로 ducky 스크립트 실행
   - `circuitpython/irremote.py` — (blocking 버전)
